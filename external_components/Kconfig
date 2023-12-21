@@ -1,0 +1,7 @@
+
+
+rsource "esp-idf/components/freertos/Kconfig"
+rsource "esp-idf/components/esp_system/Kconfig"
+rsource "esp-idf/components/soc/linux/include/soc/Kconfig.soc_caps.in"
+rsource "esp-idf/components/log/Kconfig"
+rsource "esp-idf/components/efuse/Kconfig"
