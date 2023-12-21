@@ -47,6 +47,11 @@ class PixelTracker {
     storage_ = Storage();
     position_ = 0;
   }
+
+  /** @brief Update the array at the current position and update the position. */
+  void Update(uint8_t value) {
+    storage_[position_++] = value;
+  }
  private:
 
   /** @brief One dimensionsal array of pixels. */

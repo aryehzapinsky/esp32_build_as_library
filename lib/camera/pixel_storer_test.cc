@@ -1,4 +1,3 @@
-#include <__filesystem/copy_options.h>
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include "pixel_storer.hpp"
@@ -18,16 +17,21 @@ TEST(PixelTrackerTest, Reset) {
   EXPECT_THAT(pixel_tracker.storage(), ::testing::ElementsAreArray({0,0,0,0}));
 }
 
-TEST(PixelTrackerTest, std::filesystem::copy_options::update_existing) {
+TEST(PixelTrackerTest, update_existing) {
   PixelTracker<4> pixel_tracker = {};
   pixel_tracker.Reset();
   EXPECT_THAT(pixel_tracker.storage(), ::testing::ElementsAreArray({0,0,0,0}));
-  pixel_tracker.update(1);
-}
+  
+  pixel_tracker.Update(/*value=*/1);
+  EXPECT_THAT(pixel_tracker.storage(), ::testing::ElementsAreArray({1,0,0,0}));
+  
+  pixel_tracker.Update(/*value=*/2);
+  EXPECT_THAT(pixel_tracker.storage(), ::testing::ElementsAreArray({1,2,0,0}));
+  
+  pixel_tracker.Update(/*value=*/3);
+  EXPECT_THAT(pixel_tracker.storage(), ::testing::ElementsAreArray({1,2,3,0}));
+  
+  pixel_tracker.Update(/*value=*/4);
+  EXPECT_THAT(pixel_tracker.storage(), ::testing::ElementsAreArray({1,2,3,4}));
 
-TEST(HelloTest, BasicAssertions2) {
-  // Expect two strings not to be equal.
-  EXPECT_STRNE("hello", "world");
-  // Expect equality.
-  EXPECT_EQ(7 * 6, 42);
 }
