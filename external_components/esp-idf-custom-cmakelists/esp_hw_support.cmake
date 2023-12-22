@@ -17,7 +17,7 @@ set(esp_hw_support_includes ${ESP_HW_SUPPORT_SOURCE_DIR}/include
                             "/BuildEspAsLibrary/external_components/esp-idf/components/esp_system/include"
                             "/BuildEspAsLibrary/external_components/esp-idf/components/soc/linux/include"
                                   )
-file(GLOB esp_hw_support_sources ${ESP_HW_SUPPORT_SOURCE_DIR}/port/linux/*.c ${ESP_HW_SUPPORT_SOURCE_DIR}/esp_memory_utils.c)
+file(GLOB esp_hw_support_sources ${ESP_HW_SUPPORT_SOURCE_DIR}/port/linux/*.c)
 
 add_library(esp_hw_support STATIC ${esp_hw_support_sources})
 target_include_directories(esp_hw_support PUBLIC ${esp_hw_support_includes})
