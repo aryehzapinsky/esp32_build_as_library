@@ -40,6 +40,8 @@ set(external_components_libraries
                               esp_log
                               heap
                               esp_system
+                              esp_event
+                              esp_common
                               )
 
 target_link_libraries(src.elf PUBLIC ${external_components_libraries})
