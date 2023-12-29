@@ -15,6 +15,7 @@ include(esp-idf-custom-cmakelists/esp_log.cmake)
 include(esp-idf-custom-cmakelists/heap.cmake)
 include(esp-idf-custom-cmakelists/esp_system.cmake)
 
+include(esp-idf-custom-cmakelists/esp_common.cmake)
 include(esp-idf-custom-cmakelists/esp_event.cmake)
 
 
