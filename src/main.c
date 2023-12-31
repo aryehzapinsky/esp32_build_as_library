@@ -5,13 +5,13 @@
  */
 
 #include "esp_chip_info.h"
+#include "esp_err.h"
 #include "esp_event.h"
 #include "esp_flash.h"
 #include "esp_system.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include <stdio.h>
-#include "esp_err.h"
 
 static esp_event_loop_handle_t loop_handle;
 ESP_EVENT_DECLARE_BASE(CAMERA_CAPTURE_EVENT);
@@ -51,7 +51,7 @@ void app_main(void) {
 
   ESP_ERROR_CHECK(esp_event_handler_instance_register_with(
       loop_handle, CAMERA_CAPTURE_EVENT, ESP_EVENT_ANY_ID, run_on_event,
-      NULL /*event_handler_args*/, /*esp_event_handler_instance_t*/ NULL));
+      /*event_handler_args=*/NULL, /*esp_event_handler_instance_t=*/NULL));
 
   printf("%dMB %s flash\n", flash_size / (1024 * 1024),
          (chip_info.features & CHIP_FEATURE_EMB_FLASH) ? "embedded"
@@ -61,6 +61,11 @@ void app_main(void) {
     printf("Restarting in %d seconds...\n", i);
     vTaskDelay(1000 / portTICK_PERIOD_MS);
   }
+
+  esp_event_post_to(loop_handle, CAMERA_CAPTURE_EVENT, 0, NULL, 0, 10);
+esp_event_post_to(loop_handle, CAMERA_CAPTURE_EVENT, 0, NULL, 0, 10);
+  esp_event_loop_run(loop_handle, 100);
+
   printf("Restarting now.\n");
   fflush(stdout);
   esp_restart();
