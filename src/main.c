@@ -11,15 +11,45 @@
 #include "esp_system.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "portmacro.h"
+#include "projdefs.h"
 #include <stdio.h>
+#include "esp_log.h"
 
 static esp_event_loop_handle_t loop_handle;
 ESP_EVENT_DECLARE_BASE(CAMERA_CAPTURE_EVENT);
 ESP_EVENT_DEFINE_BASE(CAMERA_CAPTURE_EVENT);
+static int kTASK_PERIOD = 500;
+static const char* kTAG = "user_event_loop";
+
+struct CameraEventPixel {
+    int index;
+    int value;
+};
 
 void run_on_event(void *handler_arg, esp_event_base_t base, int32_t id,
                   void *event_data) {
+
+  struct CameraEventPixel event_pixel = *((struct CameraEventPixel*) event_data);
+
   printf("In event loop\n");
+  ESP_LOGI(kTAG, "handling pixel index: %d, value %d", event_pixel.index, event_pixel.value);
+}
+
+static void task_event_source(void* args)
+{
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+
+    struct CameraEventPixel event_pixel = {50, 100};
+
+    ESP_ERROR_CHECK(esp_event_post_to(loop_handle, CAMERA_CAPTURE_EVENT,
+    0, 
+    &event_pixel, sizeof(event_pixel), portMAX_DELAY));
+
+    vTaskDelay(pdMS_TO_TICKS(kTASK_PERIOD));
+
+    // Delete from inside task because wasn't working from outside of task
+    vTaskDelete(NULL);
 }
 
 void app_main(void) {
@@ -57,16 +87,25 @@ void app_main(void) {
          (chip_info.features & CHIP_FEATURE_EMB_FLASH) ? "embedded"
                                                        : "external");
 
-  for (int i = 3; i >= 0; i--) {
+  for (int i = 1; i >= 0; i--) {
     printf("Restarting in %d seconds...\n", i);
     vTaskDelay(1000 / portTICK_PERIOD_MS);
   }
 
-  esp_event_post_to(loop_handle, CAMERA_CAPTURE_EVENT, 0, NULL, 0, 10);
-esp_event_post_to(loop_handle, CAMERA_CAPTURE_EVENT, 0, NULL, 0, 10);
+ struct CameraEventPixel pixel_event = {1, 20};
+  esp_event_post_to(loop_handle, CAMERA_CAPTURE_EVENT, 0, &pixel_event, sizeof(pixel_event), 10);
+  esp_event_post_to(loop_handle, CAMERA_CAPTURE_EVENT, 0, &pixel_event, sizeof(pixel_event), 10);
+
+  TaskHandle_t task_event_source_handle;
+  xTaskCreate(task_event_source, "task_event_source",
+              3072, NULL,
+              uxTaskPriorityGet(NULL) + 1, &task_event_source_handle);
+
+    xTaskNotifyGive(task_event_source_handle);
+
   esp_event_loop_run(loop_handle, 100);
 
-  printf("Restarting now.\n");
+      printf("Restarting now.\n");
   fflush(stdout);
   esp_restart();
 }
